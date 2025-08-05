@@ -1,0 +1,5 @@
+Cython
+pandas
+requests
+beautifulsoup4
+pyodbc

@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+*.egg
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+
+# Docker
+*.env
+.env
+# Se você tiver volumes persistentes que não quer versionar
+# Ex: pasta de dados do Postgres ou Redis
+pg_data/
+redis_data/
+
+# Logs do Airflow
+logs/
+
+# Arquivos CSV gerados
+data/*.csv
+
+# Arquivos de configuração sensíveis (se houver)
+# Se você não quiser versionar seu airflow.cfg local
+airflow.cfg 

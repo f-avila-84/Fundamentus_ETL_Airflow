@@ -1,0 +1,119 @@
+# docker-compose.yaml
+#version: '3.8'
+x-airflow-common:
+  &airflow-common
+  build: .
+  image: ${AIRFLOW_IMAGE_NAME:-apache/airflow:2.8.1} # Mantenha esta linha para o nome da imagem, mas o 'build' terá precedência
+  environment:
+    &airflow-common-env
+    AIRFLOW_HOME: /opt/airflow
+    AIRFLOW__CORE__DAGS_FOLDER: /opt/airflow/dags
+    AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+    AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+    AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@postgres/airflow
+    AIRFLOW__CELERY__BROKER_URL: redis://redis:6379/0
+    AIRFLOW__CORE__FERNET_KEY: 'zN5UbKI9xxeo2UzUcgZJ3tx-bf8v7KJtEy7Q8VT8xt4='
+    AIRFLOW__CORE__WEBSERVER_PORT: '8080'
+    AIRFLOW__WEBSERVER__AUTHENTICATE: 'True'
+    AIRFLOW__WEBSERVER__AUTH_BACKEND: 'airflow.www.security.backends.database_auth'
+    AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.basic_auth'
+    #_PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-}
+    _AIRFLOW_DB_UPGRADE: 'true'
+    _AIRFLOW_WWW_USER_CREATE: 'true'
+    _AIRFLOW_WWW_USER_USERNAME: ${AIRFLOW_WWW_USER_USERNAME:-airflow}
+    _AIRFLOW_WWW_USER_PASSWORD: ${AIRFLOW_WWW_USER_PASSWORD:-airflow}
+    _AIRFLOW_WWW_USER_FIRSTNAME: ${AIRFLOW_WWW_USER_FIRSTNAME:-Airflow}
+    _AIRFLOW_WWW_USER_LASTNAME: ${AIRFLOW_WWW_USER_LASTNAME:-User}
+    _AIRFLOW_WWW_USER_EMAIL: ${AIRFLOW_WWW_USER_EMAIL:-avila.invest@gmail.com}
+    _AIRFLOW_WEBSERVER_HOST: '0.0.0.0'
+    _AIRFLOW_UID: ${AIRFLOW_UID:-50000}
+    _AIRFLOW_GID: ${AIRFLOW_GID:-0}
+  volumes:
+    - ./dags:/opt/airflow/dags
+    - ./logs:/opt/airflow/logs
+    - ./plugins:/opt/airflow/plugins
+    - ./data:/opt/airflow/data # Adicionado para sua pasta de dados
+  depends_on:
+    postgres:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+  networks:
+    - airflow
+
+services:
+  postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - airflow
+    restart: always
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - airflow
+    restart: always
+
+  airflow-webserver:
+    <<: *airflow-common
+    command: webserver
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    restart: always
+
+  airflow-scheduler:
+    <<: *airflow-common
+    command: scheduler
+    # healthcheck:
+    #   test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+    #   interval: 10s
+    #   timeout: 10s
+    #   retries: 5
+    restart: always
+
+  airflow-worker:
+    <<: *airflow-common
+    command: celery worker
+    # healthcheck:
+    #   test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+    #   interval: 10s
+    #   timeout: 10s
+    #   retries: 5
+    restart: always
+
+  airflow-init:
+    <<: *airflow-common
+    command: bash -c "exec airflow db upgrade && exec airflow users create --username ${AIRFLOW_WWW_USER_USERNAME} --password ${AIRFLOW_WWW_USER_PASSWORD} --firstname ${AIRFLOW_WWW_USER_FIRSTNAME} --lastname ${AIRFLOW_WWW_USER_LASTNAME} --role Admin --email ${AIRFLOW_WWW_USER_EMAIL}"
+    environment:
+      <<: *airflow-common-env
+      _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-}
+    user: "${AIRFLOW_UID}:0"
+    restart: "no"
+
+networks:
+  airflow:
+    name: airflow
