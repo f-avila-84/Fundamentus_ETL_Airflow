@@ -228,22 +228,33 @@ SELECT *
 ```
 
 
-🤝 Contribuindo
+### 🤝 Contribuindo
 Este é um projeto desenvolvido para fins de estudo e portfólio. No momento, não estou buscando contribuições externas. No entanto, sinta-se à vontade para fazer um fork, explorar e adaptar o código para suas necessidades!
 
 
-📧 Autor / Contato
+### 📧 Autor / Contato
 Desenvolvido por Felipe Avila.
 
-
 [github.com](https://github.com/f-avila-84)
-
 
 [linkedin.com](https://www.linkedin.com/in/avilafelipe/)
 
 
 
+### ⚠️ Aviso Legal e Disclaimer de Investimento
+Este código foi desenvolvido para fins educacionais e informativos como parte de um projeto de estudo pessoal. Ele tem como objetivo demonstrar a coleta e organização de dados fundamentalistas de forma automatizada.
 
+É fundamental entender que as informações obtidas através deste script NÃO constituem aconselhamento financeiro, recomendação de investimento ou endosso de qualquer tipo de estratégia de investimento. O mercado financeiro é complexo e investimentos envolvem riscos, incluindo a possibilidade de perda de capital.
+
+Não se baseie unicamente nos dados gerados por este código para tomar decisões de investimento.
+Retornos passados não são garantia de retornos futuros.
+Qualquer decisão de investimento é de sua inteira responsabilidade.
+Recomenda-se sempre consultar um profissional financeiro qualificado antes de tomar qualquer decisão de investimento. O desenvolvedor deste código não se responsabiliza por quaisquer perdas ou prejuízos decorrentes do uso ou interpretação das informações aqui contidas.
+
+### 📜 Licença
+Este projeto está licenciado sob a licença MIT. Veja o arquivo LICENSE para mais detalhes. 
+
+[opensource.org](https://opensource.org/license/mit)
 
 
 
