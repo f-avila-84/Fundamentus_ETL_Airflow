@@ -1,3 +1,5 @@
+USE FundamentosDB
+
 SELECT * FROM [dbo].[carga_fundamentus]
 
 SELECT * FROM 
@@ -24,6 +26,14 @@ WHERE data_execucao = '2025-08-23'
 
 
 UPDATE [dbo].[fundamentus_historico]
-SET hora_execucao = '21:46:01'
-WHERE data_execucao = '2025-08-22'
+SET hora_execucao = '21:15:54'
+WHERE data_execucao = '2025-09-18'
+
+
+
+SELECT DISTINCT
+data_execucao, 
+hora_execucao
+FROM [dbo].[fundamentus_historico]
+ORDER BY 1 DESC 
 
